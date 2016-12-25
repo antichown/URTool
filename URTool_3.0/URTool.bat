@@ -8,9 +8,6 @@ SET APP_DESCRIPTION=Extraccion y reempaquetado de archivos .DAT e .IMG en androi
 set CYGWIN=nodosfilewarning
 TITLE %APP_NAME% %AUTHORS%
 
-%~d0
-cd "%~p0"
-
 ::Comprueba carpetas y las crea si no existen
 IF NOT EXIST "1-Sources" MKDIR "1-Sources"
 IF NOT EXIST "2-Converted_IMG" MKDIR "2-Converted_IMG"
@@ -25,7 +22,7 @@ IF NOT EXIST 5-New_DAT_Ready MKDIR 5-New_DAT_Ready
 :ZIP_FILES
 CLS
 ECHO ==============================================================================
-ECHO ==                                 %APP_NAME%                               ==
+ECHO ==                       %APP_NAME%                    ==
 ECHO ==============================================================================
 ECHO ==                                %AUTHORS%                              ==
 ECHO ==============================================================================
@@ -57,7 +54,7 @@ IF NOT EXIST "%FILE%" GOTO :ZIP_FILES
 CLS
 SET "LIMPIEZA="
 ECHO ==============================================================================
-ECHO ==                                 %APP_NAME%                               ==
+ECHO ==                       %APP_NAME%                    ==
 ECHO ==============================================================================
 ECHO ==                                %AUTHORS%                              ==
 ECHO ==============================================================================
@@ -201,9 +198,10 @@ GOTO MENU
 ::Actualiza el zip original con los nuevos cambios
 :OPCION5
 ECHO Preparando entorno de trabajo...
-XCOPY 1-Sources\file_contexts "%~dp0"
-XCOPY 5-New_DAT_Ready\system.new.dat "%~dp0"
-XCOPY 5-New_DAT_Ready\system.transfer.list "%~dp0"
+move 1-Sources\file_contexts %~dp0
+move 5-New_DAT_Ready\system.new.dat %~dp0
+move 5-New_DAT_Ready\system.transfer.list %~dp0
+pause
 CLS
 ECHO Actualizando zip original...
 ECHO.
@@ -234,6 +232,7 @@ RMDIR /Q /S 2-Converted_IMG
 RMDIR /Q /S 3-IMG_Folder
 RMDIR /Q /S 4-Folder_To_IMG
 RENAME 5-New_DAT_Ready Nuevo_DAT
+RMDIR /Q /S Nuevo_DAT
 DEL system.new.dat system.transfer.list file_contexts
 CLS
 ECHO Limpieza terminada
@@ -288,13 +287,24 @@ GOTO MENU
 ::Convierte CARPETA a IMG
 :OPCION7
 CLS
-CD "%~dp0"
+FOR /R "%~p0"\2-Converted_IMG %%A IN (*) DO SET SIZE=%%~zA
+tools\make_ext4fs -T 0 -S 1-Sources\file_contexts -l %SIZE% -a system 4-Folder_To_IMG\my_new_system.img 3-IMG_Folder\system\
+IF NOT EXIST "%~dp0"\4-Folder_To_IMG\my_new_system.img goto OPCION7.1
+
+:OPCION7.1
+CLS
 FOR %%A IN ("2-Converted_IMG"\system.img) DO SET SIZE=%%~zA
 CD "%~dp0"
 tools\make_ext4fs -T 0 -S 1-Sources\file_contexts -l %SIZE% -a system 4-Folder_To_IMG\my_new_system.img 3-IMG_Folder\system\
 CLS
+ECHO --------------------
 ECHO Terminado con exito
+ECHO --------------------
+ECHO.
+ECHO.
+ECHO -----------------------------------------------------------
 ECHO En la carpeta 4-Folder_To_IMG encontrara my_new_system.img
+ECHO -----------------------------------------------------------
 ECHO.
 ECHO ENTER para ir al MENU
 PAUSE>NUL
