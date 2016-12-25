@@ -1,4 +1,4 @@
-# URTool 3.0
+# URTool 3.0 for Windows
 All in one format converter for ROMs android 5 - 7 IMG to DAT to IMG
 
 #How to use:
