@@ -89,19 +89,35 @@ GOTO MENU
 :OPCION1
 CD "%~dp0"
 CLS
-Tools\7za.exe e "%FILE%" n system.new.dat -o1-Sources
-Tools\7za.exe e "%FILE%" n system.transfer.list -o1-Sources
-Tools\7za.exe e "%FILE%" n file_contexts -o1-Sources
-Tools\sdat2img.py "1-Sources"\system.transfer.list "1-Sources"\system.new.dat "2-Converted_IMG"\system.img
-CLS
-ECHO Pasando system.IMG a carpeta en 3-IMG_Folder
+ECHO -------------------------------------
+ECHO Extrayendo archivos desde el zip ROM
+ECHO -------------------------------------
 ECHO.
-Tools\ImgExtractor.exe "2-Converted_IMG"\system.img "3-IMG_Folder\system"
+ECHO.
+ECHO En breve el proceso terminara...
+Tools\7za.exe e "%FILE%" n system.new.dat -o1-Sources>nul
+Tools\7za.exe e "%FILE%" n system.transfer.list -o1-Sources>nul
+Tools\7za.exe e "%FILE%" n file_contexts -o1-Sources>nul
 CLS
+Tools\sdat2img 1-Sources\system.transfer.list 1-Sources\system.new.dat 2-Converted_IMG\system.img
+CLS
+ECHO ---------------------------------------------
+ECHO Pasando system.IMG a carpeta en 3-IMG_Folder
+ECHO ---------------------------------------------
+ECHO.
+Tools\ImgExtractor.exe 2-Converted_IMG\system.img 3-IMG_Folder\system
+CLS
+ECHO --------------------
 ECHO Terminado con exito
+ECHO --------------------
+ECHO.
+ECHO.
 ECHO Ahora puede modificar cosas en la carpeta 3-IMG_Folder\system
 ECHO.
+ECHO.
+ECHO ----------------------
 ECHO ENTER para ir al MENU
+ECHO ----------------------
 PAUSE>NUL
 GOTO MENU
 
@@ -198,18 +214,23 @@ GOTO MENU
 ::Actualiza el zip original con los nuevos cambios
 :OPCION5
 ECHO Preparando entorno de trabajo...
-move 1-Sources\file_contexts %~dp0
-move 5-New_DAT_Ready\system.new.dat %~dp0
-move 5-New_DAT_Ready\system.transfer.list %~dp0
-pause
+move 1-Sources\file_contexts "%~dp0"
+move 5-New_DAT_Ready\system.new.dat "%~dp0"
+move 5-New_DAT_Ready\system.transfer.list "%~dp0"
 CLS
+ECHO -----------------------------
 ECHO Actualizando zip original...
+ECHO -----------------------------
 ECHO.
+CD "%~dp0"
+CLS
 Tools\7za.exe a "%FILE%" -o+ system.new.dat 
 Tools\7za.exe a "%FILE%" -o+ system.transfer.list
 Tools\7za.exe a "%FILE%" -o+ file_contexts
 CLS
+ECHO --------------------
 ECHO Terminado con exito
+ECHO --------------------
 ECHO.
 ECHO.
 CLS   ===============================================================================
